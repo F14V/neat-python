@@ -310,6 +310,7 @@ class DefaultGenome(object):
         conn_to_split = choice(list(self.connections.values()))
         new_node_id = config.get_new_node_key(self.nodes)
         ng = self.create_node(config, new_node_id)
+        ng.bias = 0.0
         self.nodes[new_node_id] = ng
 
         # Disable this connection and create two new connections joining its nodes via
@@ -327,12 +328,10 @@ class DefaultGenome(object):
         assert isinstance(output_key, int)
         assert output_key >= 0
         assert isinstance(enabled, bool)
-        key = (input_key, output_key)
-        connection = config.connection_gene_type(key)
-        connection.init_attributes(config)
+        connection = self.create_connection(config, input_key, output_key)
         connection.weight = weight
         connection.enabled = enabled
-        self.connections[key] = connection
+        self.connections[connection.key] = connection
 
     def mutate_add_connection(self, config):
         """
