@@ -338,11 +338,17 @@ class DefaultGenome(object):
         Attempt to add a new connection, the only restriction being that the output
         node cannot be one of the network input pins.
         """
+        # TODO: Maybe keep trying to add connection until successful, so that the probability holds.
+        # First check if new connections are even possible (costly?) to avoid infinite loop.
         possible_outputs = list(self.nodes)
         out_node = choice(possible_outputs)
 
         possible_inputs = possible_outputs + config.input_keys
         in_node = choice(possible_inputs)
+        
+        # Don't use output nodes as inputs
+        if in_node in config.output_keys:
+            return
 
         # Don't duplicate connections.
         key = (in_node, out_node)
@@ -351,13 +357,6 @@ class DefaultGenome(object):
             if config.check_structural_mutation_surer():
                 self.connections[key].enabled = True
             return
-
-        # Don't allow connections between two output nodes
-        if in_node in config.output_keys and out_node in config.output_keys:
-            return
-
-        # No need to check for connections between input nodes:
-        # they cannot be the output end of a connection (see above).
 
         # For feed-forward networks, avoid creating cycles.
         if config.feed_forward and creates_cycle(list(self.connections), key):
