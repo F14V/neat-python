@@ -372,23 +372,25 @@ class DefaultGenome(object):
             return -1
 
         del_key = choice(available_nodes)
-
-        connections_to_delete = set()
-        for k, v in self.connections.items():
-            if del_key in v.key:
-                connections_to_delete.add(v.key)
-
-        for key in connections_to_delete:
-            del self.connections[key]
-
         del self.nodes[del_key]
+
+        # Delete connections of chosen node
+        for key in [k for k in self.connections if del_key in k]:
+            del self.connections[key]
 
         return del_key
 
     def mutate_delete_connection(self):
-        if self.connections:
-            key = choice(list(self.connections.keys()))
-            del self.connections[key]
+        # Do nothing if there are no connections
+        if not self.connections:
+            return -1
+
+        del_key = choice(self.connections)
+        del self.connections[del_key]
+
+        # TODO: Also delete nodes if left floating? Iterating may be needed.
+
+        return del_key
 
     def distance(self, other, config):
         """
