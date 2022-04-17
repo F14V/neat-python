@@ -385,7 +385,7 @@ class DefaultGenome(object):
         if not self.connections:
             return -1
 
-        del_key = choice(self.connections)
+        del_key = choice(list(self.connections))
         del self.connections[del_key]
 
         # TODO: Also delete nodes if left floating? Iterating may be needed.
